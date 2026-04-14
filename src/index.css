@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core palette - Warm rose boutique */
+    --background: 30 30% 98%;
+    --foreground: 20 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 25% 12%;
+
+    /* Primary: Warm Rose */
+    --primary: 350 52% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Warm Cream */
+    --secondary: 30 40% 95%;
+    --secondary-foreground: 20 25% 12%;
+
+    /* Muted */
+    --muted: 30 20% 93%;
+    --muted-foreground: 20 10% 45%;
+
+    /* Accent: Gold/Champagne */
+    --accent: 38 60% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & Input */
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 350 52% 58%;
+    --radius: 0.625rem;
+
+    /* Extended rose palette */
+    --rose: 350 52% 58%;
+    --rose-light: 350 60% 78%;
+    --rose-dark: 350 50% 42%;
+
+    /* Gold palette */
+    --gold: 38 60% 52%;
+    --gold-light: 42 70% 68%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(350 52% 58%), hsl(350 60% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(350 52% 58% / 0.92), hsl(20 30% 20% / 0.85));
+    --gradient-gold: linear-gradient(135deg, hsl(38 60% 52%), hsl(42 70% 68%));
+    --gradient-warm: linear-gradient(180deg, hsl(30 30% 98%), hsl(30 40% 95%));
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px hsl(20 25% 12% / 0.04);
+    --shadow-card: 0 2px 16px -4px hsl(20 25% 12% / 0.06);
+    --shadow-elevated: 0 8px 30px -6px hsl(20 25% 12% / 0.1);
+    --shadow-primary: 0 8px 24px -6px hsl(350 52% 58% / 0.25);
+    --shadow-glow: 0 0 40px hsl(350 60% 78% / 0.3);
+  }
+
+  .dark {
+    --background: 20 20% 7%;
+    --foreground: 30 20% 92%;
+    --card: 20 18% 10%;
+    --card-foreground: 30 20% 92%;
+    --popover: 20 18% 10%;
+    --popover-foreground: 30 20% 92%;
+    --primary: 350 55% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 20 15% 15%;
+    --secondary-foreground: 30 20% 92%;
+    --muted: 20 12% 18%;
+    --muted-foreground: 30 12% 60%;
+    --accent: 38 55% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 20 12% 20%;
+    --input: 20 12% 20%;
+    --ring: 350 55% 62%;
+    --rose: 350 55% 62%;
+    --rose-light: 350 50% 72%;
+    --rose-dark: 350 48% 48%;
+    --gold: 38 55% 55%;
+    --gold-light: 42 60% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+  .gradient-warm {
+    background: var(--gradient-warm);
+  }
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  .shadow-primary-glow {
+    box-shadow: var(--shadow-primary);
+  }
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Scrollbar styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
