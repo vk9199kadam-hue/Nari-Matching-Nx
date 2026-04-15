@@ -69,14 +69,18 @@ export function Navbar() {
             <Search className="h-5 w-5" />
           </button>
 
-          {/* PWA Install */}
+          {/* Attractive PWA Install Button */}
           {isInstallable && (
             <button 
               onClick={installPWA} 
-              className="p-2 text-primary hover:text-primary/80 transition-all flex items-center justify-center bg-primary/10 rounded-full hover:bg-primary/20"
-              title="Download App"
+              className="group relative flex items-center gap-2 px-3 py-1.5 ml-1 bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 text-primary border border-primary/20 rounded-full transition-all duration-300 shadow-sm hover:shadow-md animate-pulse-subtle"
             >
-              <Download className="h-5 w-5" />
+              <Download className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-bold uppercase tracking-wider hidden sm:inline-block">Install App</span>
+              <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
             </button>
           )}
 
