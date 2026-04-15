@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingBag, User, Search, Menu, X, ChevronDown, LogOut, LayoutDashboard } from 'lucide-react'
+import { ShoppingBag, User, Search, Menu, X, ChevronDown, LogOut, LayoutDashboard, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCartStore } from '@/store/cartStore'
 import { useAuthStore } from '@/store/authStore'
 import { categoryGroups } from '@/data/categories'
 import { cn } from '@/lib/utils'
+import { usePWAInstall } from '@/hooks/usePWAInstall'
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -14,6 +15,7 @@ export function Navbar() {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const totalItems = useCartStore(s => s.totalItems)
   const { user, isAuthenticated, logout } = useAuthStore()
+  const { isInstallable, installPWA } = usePWAInstall()
   const navigate = useNavigate()
 
   const handleSearch = (e: React.FormEvent) => {
@@ -66,6 +68,17 @@ export function Navbar() {
           <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
             <Search className="h-5 w-5" />
           </button>
+
+          {/* PWA Install */}
+          {isInstallable && (
+            <button 
+              onClick={installPWA} 
+              className="p-2 text-primary hover:text-primary/80 transition-all flex items-center justify-center bg-primary/10 rounded-full hover:bg-primary/20"
+              title="Download App"
+            >
+              <Download className="h-5 w-5" />
+            </button>
+          )}
 
           {/* Cart */}
           <Link to="/cart" className="relative p-2 text-foreground/70 hover:text-foreground transition-colors">

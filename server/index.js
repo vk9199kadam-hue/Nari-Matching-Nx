@@ -60,18 +60,76 @@ app.get('/api/products', async (req, res) => {
 app.patch('/api/variants/:id/stock', async (req, res) => {
   const { id } = req.params;
   const { stock } = req.body;
-
   try {
-    const result = await query(
-      'UPDATE product_variants SET stock = $1 WHERE id = $2 RETURNING *',
-      [stock, id]
+    const result = await query('UPDATE product_variants SET stock = $1 WHERE id = $2 RETURNING *', [stock, id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Variant not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// Add new product with variants
+app.post('/api/products', async (req, res) => {
+  const p = req.body;
+  try {
+    // Insert Product
+    await query(
+      `INSERT INTO products (id, name, description, category_id, base_price, discount_percent, images, fabric, care_instructions, tags, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [p.id, p.name, p.description, p.category, p.basePrice, p.discountPercent, p.images, p.fabric, p.careInstructions, p.tags, p.isActive]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Variant not found' });
+    // Insert Variants
+    for (const v of p.variants) {
+      await query(
+        `INSERT INTO product_variants (id, product_id, sku, size, color, stock, price_override)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [v.id, p.id, v.sku, v.size, v.color, v.stock, v.priceOverride || null]
+      );
     }
+    res.status(201).json({ message: 'Product added successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
-    res.json(result.rows[0]);
+// Update product and variants
+app.put('/api/products/:id', async (req, res) => {
+  const { id } = req.params;
+  const p = req.body;
+  try {
+    // Update Product
+    await query(
+      `UPDATE products SET name=$1, description=$2, category_id=$3, base_price=$4, discount_percent=$5, images=$6, fabric=$7, care_instructions=$8, tags=$9, is_active=$10
+       WHERE id=$11`,
+      [p.name, p.description, p.category, p.basePrice, p.discountPercent, p.images, p.fabric, p.careInstructions, p.tags, p.isActive, id]
+    );
+
+    // Simplistic variant update: Delete old and insert new (or could be improved to patch)
+    await query('DELETE FROM product_variants WHERE product_id = $1', [id]);
+    for (const v of p.variants) {
+      await query(
+        `INSERT INTO product_variants (id, product_id, sku, size, color, stock, price_override)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [v.id, id, v.sku, v.size, v.color, v.stock, v.priceOverride || null]
+      );
+    }
+    res.json({ message: 'Product updated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// Delete product
+app.delete('/api/products/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await query('DELETE FROM products WHERE id = $1', [id]);
+    res.json({ message: 'Product deleted successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });

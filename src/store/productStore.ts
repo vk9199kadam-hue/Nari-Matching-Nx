@@ -7,9 +7,9 @@ import { categories, categoryGroups } from '@/data/categories'
 interface ProductStore {
   products: Product[]
   fetchProducts: () => Promise<void>
-  addProduct: (product: Product) => void
-  updateProduct: (id: string, updates: Partial<Product>) => void
-  deleteProduct: (id: string) => void
+  addProduct: (product: Product) => Promise<void>
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
   toggleActive: (id: string) => void
   updateVariantStock: (productId: string, variantId: string, stock: number) => Promise<void>
   addVariant: (productId: string, variant: ProductVariant) => void
@@ -39,17 +39,50 @@ export const useProductStore = create<ProductStore>()(
         }
       },
 
-      addProduct: (product) => set(state => ({
-        products: [...state.products, product],
-      })),
+      addProduct: async (product) => {
+        try {
+          await fetch('http://localhost:5000/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+          })
+          set(state => ({ products: [...state.products, product] }))
+        } catch (error) {
+          console.error('Failed to add product:', error)
+        }
+      },
 
-      updateProduct: (id, updates) => set(state => ({
-        products: state.products.map(p => p.id === id ? { ...p, ...updates } : p),
-      })),
+      updateProduct: async (id, updates) => {
+        try {
+          // Prepare the full product object for updating
+          const current = get().products.find(p => p.id === id)
+          if (!current) return
+          const updatedProduct = { ...current, ...updates }
 
-      deleteProduct: (id) => set(state => ({
-        products: state.products.filter(p => p.id !== id),
-      })),
+          await fetch(`http://localhost:5000/api/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProduct)
+          })
+
+          set(state => ({
+            products: state.products.map(p => p.id === id ? updatedProduct : p),
+          }))
+        } catch (error) {
+          console.error('Failed to update product:', error)
+        }
+      },
+
+      deleteProduct: async (id) => {
+        try {
+          await fetch(`http://localhost:5000/api/products/${id}`, {
+            method: 'DELETE'
+          })
+          set(state => ({ products: state.products.filter(p => p.id !== id) }))
+        } catch (error) {
+          console.error('Failed to delete product:', error)
+        }
+      },
 
       toggleActive: (id) => set(state => ({
         products: state.products.map(p =>
