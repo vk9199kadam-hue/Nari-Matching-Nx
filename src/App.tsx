@@ -14,6 +14,7 @@ import { AdminDashboardPage } from '@/pages/admin/DashboardPage'
 import { AdminProductsPage } from '@/pages/admin/ProductsManagePage'
 import { AdminOrdersPage } from '@/pages/admin/OrdersManagePage'
 import { AdminStockPage } from '@/pages/admin/StockManagePage'
+import { CustomersManagePage } from '@/pages/admin/CustomersManagePage'
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/admin/products" element={<AdminProductsPage />} />
           <Route path="/admin/stock" element={<AdminStockPage />} />
           <Route path="/admin/orders" element={<AdminOrdersPage />} />
+          <Route path="/admin/customers" element={<CustomersManagePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -12,13 +12,13 @@ export function LoginPage() {
   const login = useAuthStore(s => s.login)
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    const result = login(email, password)
+    const result = await login(email, password)
     if (result.success) {
       toast.success('Welcome back!')
-      navigate('/')
+      navigate('/', { replace: true })
     } else {
       setError(result.error || 'Login failed')
     }

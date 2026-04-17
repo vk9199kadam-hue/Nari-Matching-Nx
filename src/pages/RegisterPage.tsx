@@ -15,7 +15,7 @@ export function RegisterPage() {
   const register = useAuthStore(s => s.register)
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
@@ -28,10 +28,10 @@ export function RegisterPage() {
       return
     }
 
-    const result = register(name, email, password, phone)
+    const result = await register(name, email, password, phone)
     if (result.success) {
       toast.success('Account created successfully!')
-      navigate('/')
+      navigate('/', { replace: true })
     } else {
       setError(result.error || 'Registration failed')
     }

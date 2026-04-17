@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingCart, ArrowLeft, Boxes } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, ArrowLeft, Boxes, Users } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
 import { Toaster } from 'sonner'
@@ -10,6 +10,7 @@ const adminLinks = [
   { to: '/admin/products', icon: Package, label: 'Products', end: true },
   { to: '/admin/stock', icon: Boxes, label: 'Stock', end: true },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Orders', end: false },
+  { to: '/admin/customers', icon: Users, label: 'Customers', end: true },
 ]
 
 export function AdminLayout() {

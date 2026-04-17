@@ -36,6 +36,37 @@ CREATE TABLE IF NOT EXISTS product_variants (
     price_override DECIMAL(10,2)
 );
 
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name STRING NOT NULL,
+    email STRING UNIQUE NOT NULL,
+    password_hash STRING NOT NULL,
+    phone STRING,
+    role STRING DEFAULT 'customer',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Orders Table
+CREATE TABLE IF NOT EXISTS orders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status STRING DEFAULT 'pending',
+    shipping_address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Order Items Table
+CREATE TABLE IF NOT EXISTS order_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
+    product_id STRING REFERENCES products(id),
+    variant_id STRING REFERENCES product_variants(id),
+    quantity INT NOT NULL,
+    price_at_purchase DECIMAL(10,2) NOT NULL
+);
+
 -- ── Initial Category Seed ──
 INSERT INTO categories (id, name, "group", image) VALUES
 ('kurtis-short', 'Short Kurtis', 'Kurtis', '/images/kurti-product.png'),

@@ -21,7 +21,7 @@ export function CheckoutPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   if (items.length === 0) {
-    navigate('/cart')
+    navigate('/cart', { replace: true })
     return null
   }
 
@@ -55,14 +55,43 @@ export function CheckoutPage() {
     if (!validate()) return
     setLoading(true)
 
-    // Simulate order creation
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const { token } = useAuthStore.getState()
+      const payload = {
+        totalAmount: grandTotal,
+        shippingAddress: JSON.stringify(form),
+        items: items.map(i => ({ 
+          product_id: i.productId, 
+          variant_id: i.variantId, 
+          quantity: i.quantity, 
+          price: i.price 
+        }))
+      }
 
-    const orderId = `ORD-${Date.now().toString().slice(-6)}`
-    clearCart()
-    toast.success('Order placed successfully!')
-    navigate(`/orders/${orderId}`, { state: { newOrder: true, form, items } })
-    setLoading(false)
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Failed to place order')
+      }
+      
+      const { order } = await res.json()
+
+      clearCart()
+      toast.success('Order placed successfully!')
+      navigate(`/orders/${order.id}`, { state: { newOrder: true, form, items }, replace: true })
+    } catch (error: any) {
+      toast.error(error.message || 'Error placing order')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const updateField = (field: string, value: string) => {

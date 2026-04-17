@@ -13,51 +13,57 @@ export interface User {
 
 interface AuthState {
   user: User | null
+  token: string | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => { success: boolean; error?: string }
-  register: (name: string, email: string, password: string, phone?: string) => { success: boolean; error?: string }
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
 }
 
-const mockUsers: (User & { password: string })[] = [
-  { id: 'admin1', name: 'Nari Matching Nx Admin', email: 'admin@narimatchingnx.com', role: 'admin', phone: '9999999999', password: 'admin123' },
-  { id: 'u1', name: 'Priya Sharma', email: 'priya@example.com', role: 'customer', phone: '9876543210', password: 'test123' },
-]
+const API_URL = '/api/auth'
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
 
-      login: (email, password) => {
-        const found = mockUsers.find(u => u.email === email && u.password === password)
-        if (found) {
-          const { password: _, ...user } = found
-          set({ user, isAuthenticated: true })
+      login: async (email, password) => {
+        try {
+          const res = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Login failed')
+          
+          set({ user: data.user, token: data.token, isAuthenticated: true })
           return { success: true }
+        } catch (error: any) {
+          return { success: false, error: error.message }
         }
-        return { success: false, error: 'Invalid email or password' }
       },
 
-      register: (name, email, _password, phone) => {
-        const exists = mockUsers.find(u => u.email === email)
-        if (exists) {
-          return { success: false, error: 'An account with this email already exists' }
+      register: async (name, email, password, phone) => {
+        try {
+          const res = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, phone })
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Registration failed')
+          
+          set({ user: data.user, token: data.token, isAuthenticated: true })
+          return { success: true }
+        } catch (error: any) {
+          return { success: false, error: error.message }
         }
-        const newUser: User = {
-          id: `u${Date.now()}`,
-          name,
-          email,
-          role: 'customer',
-          phone,
-        }
-        mockUsers.push({ ...newUser, password: _password })
-        set({ user: newUser, isAuthenticated: true })
-        return { success: true }
       },
 
-      logout: () => set({ user: null, isAuthenticated: false }),
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
     { name: 'nari-matching-auth' }
   )

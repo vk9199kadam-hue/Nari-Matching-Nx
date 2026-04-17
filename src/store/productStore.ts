@@ -31,7 +31,7 @@ export const useProductStore = create<ProductStore>()(
       // Initialize by fetching from API
       fetchProducts: async () => {
         try {
-          const response = await fetch('http://localhost:5000/api/products')
+          const response = await fetch('/api/products')
           const data = await response.json()
           set({ products: data })
         } catch (error) {
@@ -41,7 +41,7 @@ export const useProductStore = create<ProductStore>()(
 
       addProduct: async (product) => {
         try {
-          await fetch('http://localhost:5000/api/products', {
+          await fetch('/api/products', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(product)
@@ -59,7 +59,7 @@ export const useProductStore = create<ProductStore>()(
           if (!current) return
           const updatedProduct = { ...current, ...updates }
 
-          await fetch(`http://localhost:5000/api/products/${id}`, {
+          await fetch(`/api/products/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedProduct)
@@ -75,7 +75,7 @@ export const useProductStore = create<ProductStore>()(
 
       deleteProduct: async (id) => {
         try {
-          await fetch(`http://localhost:5000/api/products/${id}`, {
+          await fetch(`/api/products/${id}`, {
             method: 'DELETE'
           })
           set(state => ({ products: state.products.filter(p => p.id !== id) }))
@@ -107,7 +107,7 @@ export const useProductStore = create<ProductStore>()(
           }))
 
           // Sync with CockroachDB
-          await fetch(`http://localhost:5000/api/variants/${variantId}/stock`, {
+          await fetch(`/api/variants/${variantId}/stock`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ stock: Math.max(0, stock) })
