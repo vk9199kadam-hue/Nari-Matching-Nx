@@ -32,8 +32,11 @@ export const useProductStore = create<ProductStore>()(
       fetchProducts: async () => {
         try {
           const response = await fetch('/api/products')
+          if (!response.ok) throw new Error('API Response not ok')
           const data = await response.json()
-          set({ products: data })
+          if (Array.isArray(data)) {
+            set({ products: data })
+          }
         } catch (error) {
           console.error('Failed to fetch products:', error)
         }
