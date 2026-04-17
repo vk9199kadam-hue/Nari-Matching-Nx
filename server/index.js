@@ -281,7 +281,11 @@ app.delete('/api/products/:id', authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port} with Authentication enabled`);
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port} with Authentication enabled`);
+  });
+}
+
+export default app;
 
