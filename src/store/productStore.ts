@@ -169,10 +169,10 @@ export const useProductStore = create<ProductStore>()(
 
       getNewArrivals: () =>
         get().products
-          .filter(p => p.isActive)
+          .filter(p => !!p && p.isActive)
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, 6),
     }),
-    { name: 'nari-matching-products' }
+    { name: 'nari-matching-products-v2' }
   )
 )
