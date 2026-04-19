@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { products as initialProducts, type Product, type ProductVariant } from '@/data/products'
 import type { CategoryId } from '@/data/categories'
 import { categories, categoryGroups } from '@/data/categories'
+import { useAuthStore } from './authStore'
 
 interface ProductStore {
   products: Product[]
@@ -44,46 +45,63 @@ export const useProductStore = create<ProductStore>()(
 
       addProduct: async (product) => {
         try {
-          await fetch('/api/products', {
+          const token = useAuthStore.getState().token
+          const response = await fetch('/api/products', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(product)
           })
+          if (!response.ok) throw new Error('Failed to add product on server')
           set(state => ({ products: [...state.products, product] }))
         } catch (error) {
           console.error('Failed to add product:', error)
+          throw error
         }
       },
 
       updateProduct: async (id, updates) => {
         try {
-          // Prepare the full product object for updating
+          const token = useAuthStore.getState().token
           const current = get().products.find(p => p.id === id)
           if (!current) return
           const updatedProduct = { ...current, ...updates }
 
-          await fetch(`/api/products/${id}`, {
+          const response = await fetch(`/api/products/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(updatedProduct)
           })
+          if (!response.ok) throw new Error('Failed to update product on server')
 
           set(state => ({
             products: state.products.map(p => p.id === id ? updatedProduct : p),
           }))
         } catch (error) {
           console.error('Failed to update product:', error)
+          throw error
         }
       },
 
       deleteProduct: async (id) => {
         try {
-          await fetch(`/api/products/${id}`, {
-            method: 'DELETE'
+          const token = useAuthStore.getState().token
+          const response = await fetch(`/api/products/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           })
+          if (!response.ok) throw new Error('Failed to delete product on server')
           set(state => ({ products: state.products.filter(p => p.id !== id) }))
         } catch (error) {
           console.error('Failed to delete product:', error)
+          throw error
         }
       },
 
@@ -95,6 +113,7 @@ export const useProductStore = create<ProductStore>()(
 
       updateVariantStock: async (productId, variantId, stock) => {
         try {
+          const token = useAuthStore.getState().token
           // Update local state first for instant feedback (Optimistic Update)
           set(state => ({
             products: state.products.map(p =>
@@ -110,13 +129,18 @@ export const useProductStore = create<ProductStore>()(
           }))
 
           // Sync with CockroachDB
-          await fetch(`/api/variants/${variantId}/stock`, {
+          const response = await fetch(`/api/variants/${variantId}/stock`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ stock: Math.max(0, stock) })
           })
+          if (!response.ok) throw new Error('Failed to update stock on server')
         } catch (error) {
           console.error('Failed to update stock in DB:', error)
+          // Ideally we would roll back the local state here on failure
         }
       },
 

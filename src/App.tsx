@@ -16,7 +16,16 @@ import { AdminOrdersPage } from '@/pages/admin/OrdersManagePage'
 import { AdminStockPage } from '@/pages/admin/StockManagePage'
 import { CustomersManagePage } from '@/pages/admin/CustomersManagePage'
 
+import { useEffect } from 'react'
+import { useProductStore } from '@/store/productStore'
+
 function App() {
+  const fetchProducts = useProductStore(state => state.fetchProducts)
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
+
   return (
     <BrowserRouter>
       <Routes>
