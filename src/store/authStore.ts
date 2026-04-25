@@ -18,6 +18,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
+  guestLogin: (role: UserRole) => void
 }
 
 const API_URL = '/api/auth'
@@ -28,6 +29,19 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+
+      guestLogin: (role) => {
+        set({
+          user: {
+            id: 'demo-id',
+            name: role === 'admin' ? 'Demo Admin' : 'Demo Customer',
+            email: role === 'admin' ? 'admin@demo.com' : 'customer@demo.com',
+            role: role
+          },
+          token: 'demo-token',
+          isAuthenticated: true
+        })
+      },
 
       login: async (email, password) => {
         try {

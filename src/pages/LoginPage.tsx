@@ -43,6 +43,22 @@ export function LoginPage() {
             <Button type="submit" className="w-full" size="lg">Sign In</Button>
           </form>
 
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or quick access</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" onClick={() => { useAuthStore.getState().guestLogin('admin'); navigate('/admin'); }} className="w-full">
+              Guest Admin
+            </Button>
+            <Button variant="outline" onClick={() => { useAuthStore.getState().guestLogin('customer'); navigate('/'); }} className="w-full">
+              Guest User
+            </Button>
+          </div>
+
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link to="/register" className="text-primary font-medium hover:underline">Create Account</Link>

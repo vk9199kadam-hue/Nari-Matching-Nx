@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, ArrowLeft, Boxes, Users } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
@@ -14,10 +15,23 @@ const adminLinks = [
 ]
 
 export function AdminLayout() {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, guestLogin } = useAuthStore()
+
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== 'admin') {
+      guestLogin('admin')
+    }
+  }, [isAuthenticated, user, guestLogin])
 
   if (!isAuthenticated || user?.role !== 'admin') {
-    return <Navigate to="/login" replace />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary/30">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <p className="text-muted-foreground animate-pulse">Initializing Admin Session...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
